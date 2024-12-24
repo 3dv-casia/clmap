@@ -1,0 +1,236 @@
+---
+##############################
+# global config
+cfg_type: "lineloc"
+weight_path: "~/.limap/models" 
+load_meta: False
+load_det: False
+load_vpdet: False    # load VP detection results
+load_match: False
+load_fit: False 
+load_undistort: False 
+use_tmp: False
+n_visible_views: 4
+n_neighbors: 20 
+use_cuda: True
+visualize: False
+max_image_dim: 1600
+skip_exists: False
+output_dir: null 
+output_folder: "finaltracks"
+load_dir: null
+n_jobs: -1 # for undistortion
+undistortion_output_dir: "undistorted_images"
+resized_output_dir: "resized_images"
+
+##############################
+# localization config
+localization:
+    2d_matcher: "sold2" # ["epipolar", "sold2", "superglue_endpoints"] Other configs for superglue_endpoints are the same as in "line2d" section
+    epipolar_filter: False # No use for epipolar matcher
+    IoU_threshold: 0.2
+    reprojection_filter: null  # [null, "Perpendicular", "Midpoint", "Midpoint_Perpendicular"]
+    ransac:
+        method: "hybrid"    # [null, "ransac", "solver", "hybrid"]
+        thres: 10.0         # Only for normal & solver
+        thres_point: 10.0
+        thres_line: 10.0
+        weight_point: 1.0   # data type weights for scoring
+        weight_line: 1.0    # data type weights for scoring
+        final_least_squares: True
+        min_num_iterations: 100
+        solver_flags: [True, True, True, True]
+    optimize:
+        loss_func: "TrivialLoss"
+        loss_func_args: []
+    line_cost_func: "PerpendicularDist"
+    line_weight: 1.0        # weight for optimization (cost function)
+    hloc:
+        skip_exists: False
+    skip_exists: False
+
+##############################
+# fitting config
+fitting:
+    var2d: -1.0 # depends on the detector
+    ransac_th: 0.75
+    min_percentage_inliers: 0.9
+    n_jobs: -1
+
+##############################
+# merging config
+merging:
+    do_merging: False
+    var2d: -1.0 # depends on the detector
+    linker3d:
+        score_th: 0.5
+        th_angle: 8.0
+        th_overlap: 0.01
+        th_smartoverlap: 0.1
+        th_smartangle: 1.0
+        th_perp: 0.75
+        th_innerseg: 0.75
+    linker2d:
+        score_th: 0.5
+        th_angle: 5.0
+        th_perp: 2.0 # in pixels
+        th_overlap: 0.05
+remerging:
+    disable: False
+    linker3d:
+        score_th: 0.5
+        th_angle: 5.0
+        th_overlap: 0.001
+        th_smartoverlap: 0.1
+        th_smartangle: 1.0
+        th_perp: 0.5
+        th_innerseg: 0.5
+filtering2d:
+    th_angular_2d: 8.0
+    th_perp_2d: 5.0 # in pixels
+
+##############################
+# sfm config
+sfm: 
+    colmap_output_path: "colmap_outputs"
+    reuse: False
+    min_triangulation_angle: 1.0
+    neighbor_type: "dice" # ["overlap", "iou", "dice"]
+    ranges:
+        range_robust: [0.05, 0.95]
+        k_stretch: 1.25
+    hloc:
+        descriptor: "superpoint_aachen"
+        matcher: "superpoint+lightglue"
+
+##############################
+# line detection and matching config
+line2d:
+    max_num_2d_segs: 3000
+    do_merge_lines: False
+    visualize: False                           # output detected 2D line segments image
+    visualize_point_line_association: False    # output point-line association image
+    visualize_line_vp_association: False       # output line-vp association image
+    visualize_one_to_many_line_matches: False  # output two subimage, the left subimage shows a reference line, and the right subimage shows the matched top K lines
+    save_l3dpp: False  # save lines in l3dpp format
+    save_l3dpp_matches: False  # save line matches in l3dpp format
+    compute_descinfo: False
+    detector: 
+        method: "deeplsd"   # ["lsd", "sold2", "hawpv3", "tp_lsd", "deeplsd"]
+        skip_exists: False
+    extractor: 
+        method: "wireframe" # ["sold2", "lbd", "l2d2", "linetr", "superpoint_endpoints", "wireframe"]
+        skip_exists: False
+    matcher:
+        method: "gluestick" # ["sold2", "lbd", "l2d2", "linetr", "nn_endpoints", "superglue_endpoints", "gluestick"]
+        n_jobs: 1
+        topk: 10            # only hold topk matches
+        skip_exists: False
+        superglue:
+            weights: "outdoor" # ["indoor", "outdoor"] for selecting superglue models
+var2d: # in pixels
+    sold2: 5.0
+    lsd: 2.0
+    hawpv3: 5.0
+    tp_lsd: 5.0
+    deeplsd: 4.0
+
+
+##############################
+# triangulation config
+triangulation:
+    # base
+    debug_mode: false       # enable debug_mode to report consistency percentage and redundant information
+    add_halfpix: False
+    min_length_2d: 0.0      # in pixels
+    var2d: -1.0             # depending on the detector
+    linker2d_config:
+        score_th: 0.5
+        th_angle: 5.0
+        th_perp: 2.0        # in pixels
+        th_overlap: 0.05
+    linker3d_config:
+        score_th: 0.5
+        th_angle: 10.0
+        th_overlap: 0.05
+        th_smartoverlap: 0.1
+        th_smartangle: 2.0
+        th_perp: 1.0
+        th_innerseg: 1.0
+        th_scaleinv: 0.015
+    bi-matching: false
+
+    # matching by epipolar IoU
+    match_lines_by_epipolar_IoU: false
+    n_matches: 10
+    th_IoU: 0.1
+
+    # proposal generation
+    use_unshared_points: true
+    use_range_filter: true
+    use_exhaustive_matcher: false
+    use_endpoints_triangulation: False
+    line_tri_angle_threshold: 1.0
+    IoU_threshold: 0.1
+    sensitivity_threshold: 70.0
+    max_point_line_reproject_distance: 1.0  # in pixels
+    use_vp: true
+    vpdet_config:
+        method: "jlinkage"
+        n_jobs: 16
+        min_length: 20
+    use_pointsfm: true
+    pointsfm_config:
+        colmap_folder: null
+        reuse_sfminfos_colmap: true
+        use_neighbors: true
+    disable_many_points_triangulation: false    # disable "Multiple Points" line triangulation
+    disable_one_point_triangulation: false      # disable "Line + Point" line triangulation
+    disable_algebraic_triangulation: false      # disable "Line + Line" line triangulation
+    disable_vp_triangulation: false             # disable "Line + VP" line triangulation
+
+    # best proposal selection
+    initial_global_best_proposal: "local"  # ["local", "random"]
+    min_change_ratio: 0.3
+    max_iter_num: 3
+    th_global_score: 1.5
+    use_local_valid_lines2d: false
+
+    # line track building
+    line_track_building_method: "cluster"   # ["cluster", "best_prop"]
+    clustering_method: "collinearity2D"     # ["greedy", "exhaustive", "avg", "collinearity2D"]
+    num_outliers_aggregator: 2              # choose the (num_outliers_aggregator + 1) th far projected 3D endpoint as the final 3D endpoint.
+    max_same_line3D_overlap: 0.0
+    min_same_line3D_angle: 2.0              # in degrees
+    min_same_line3D_perp_dist: 2.0          # in pixels
+    aggregate_method: "direction_PCA"       # ["point_PCA", "point_weighted_PCA", "direction_PCA", "direction_weighted_PCA"]
+    show_valid: false                       # show best proposals that have at least one supporting 2D line segment when `line_track_building_method` is "best_prop"
+
+    # track remerging and filtering
+    remerging:
+        disable: false
+        linker3d:
+            score_th: 0.5
+            th_angle: 5.0
+            th_overlap: 0.001
+            th_smartoverlap: 0.1
+            th_smartangle: 1.0
+            th_perp: 1.0
+            th_innerseg: 1.0
+        use_collinearity2D: true
+    filtering2d:
+        th_angular_2d: 8.0
+        th_perp_2d: 5.0
+        th_sv_angular_3d: 75.0
+        th_sv_num_supports: 3
+        th_overlap: 0.5
+        th_overlap_num_supports: 3
+
+
+##############################
+# structures config
+structures:
+    bpt2d:
+        threshold_keypoints: 2.0
+        threshold_intersection: 2.0
+        threshold_merge_junctions: 2.0

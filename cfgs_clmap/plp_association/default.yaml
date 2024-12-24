@@ -1,0 +1,82 @@
+plp_association:
+    max_ba_num_iteration: 50
+
+    # vpdetection
+    vpdet:
+        method: "jlinkage"
+        n_jobs: 16
+        min_length: 20
+
+    print_summary: true  # print ceres summary
+
+    constant_intrinsics: true
+    constant_principal_point: true
+    constant_pose: true
+    constant_point: false
+    constant_line: false
+    constant_vp: false
+    constant_plane: false
+
+    use_point_geometry: true
+    use_line_geometry: true
+    use_pointline: true
+    use_vpline: true
+    use_pointplane: true
+    use_lineplane: true
+    use_vp_orthogonality: true
+    use_vp_collinearity: false
+    use_plane_orthogonality: false
+    use_plane_parallelism: false
+
+    merge_vp: false
+
+    use_uncertainty: false  # enable scale-invariance
+
+    # loss weights
+    use_adaptive_lw: true  # using adaptive loss weight will disable following manually set parameters
+    lw_point: 0.0
+    # lw_line: 1.0  # fixed parameter, just for understanding, it can't be changed.
+    lw_pointline_association: 0.0
+    lw_vpline_association: 0.0
+    lw_vp_orthogonality: 0.0
+    lw_vp_collinearity: 0.0
+    lw_pointplane_association: 0.0
+    lw_lineplane_distance_association: 0.0
+    lw_lineplane_angle_association: 0.0
+    lw_plane_orthogonality: 0.0
+    lw_plane_parallelism: 0.0
+
+    # line
+    min_num_images: 3
+    num_outliers_aggregate: 2
+    geometric_alpha: 10.0
+
+    # point-line association
+    th_pixel: 2.0  #  in pixels, 2D point-line association threshold
+    th_weight_pointline: 3.0 # add point-line association to residuals if the number of valid 2D point-line association >= th_weight_pointline
+
+    # vp-line association
+    th_count_vpline: 3  # add vp-line association if the number of valid relations of vp3d and line3d >= th_count_vpline
+
+    # vp
+    th_angle_orthogonality: 87.0
+    th_angle_collinearity: 1.0
+
+    # plane
+    th_plane_orthogonality_angle: 87.0
+    th_plane_parallelism_angle: 1.0
+    mini_plane_type_str: "CP"  # ["CP", "QUATERNION", "HOMOGENEOUS"]
+    plane_intersection_min_angle: 30.0
+    point_var2d: 1.0
+    line_var2d: 4.0           # depends on line detector, 4.0 for DeepLSD, it should be manually set in the current version
+    point_u_method: "median"  # ["median", "average", "min"]
+    line_u_method: "median"   # ["median", "average", "min"]
+    num_points_on_line: 1     # [0, 1, 2], 0: closest-point method, 1: set the median point of the 3D line segment as the unique fixed point, 2: set the start and end point of the 3D line segment as the two fixed points.
+    min_support_line: 3       # filter a 3D plane if the number of its associated 3D line segments < min_support_line
+
+    # output
+    th_hard_pl_si_dist3d: 2.0
+    th_hard_vpline_angle3d: 5.0
+    th_hard_pointplane_si_dist3d: 2.0
+    th_hard_lineplane_si_dist3d: 2.0
+    th_hard_lineplane_angle: 30.0

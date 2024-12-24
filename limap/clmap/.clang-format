@@ -1,0 +1,13 @@
+BasedOnStyle: Google
+DerivePointerAlignment: false
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:    '^"clmap'
+    Priority: 1
+  - Regex:    '^"thirdparty'
+    Priority: 2
+  - Regex:    '^<[[:alnum:]_]+>'
+    Priority: 3
+  - Regex:    '.*'
+    Priority: 4
+SortIncludes: true
