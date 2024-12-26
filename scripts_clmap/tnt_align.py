@@ -99,6 +99,9 @@ def main():
     cmd = 'colmap model_converter --input_path {0} --output_path {1} --output_type PLY'.format(
         os.path.join(basepath, 'aligned'), os.path.join(basepath, 'aligned/points.ply'))
     cmd_list.append(cmd)
+    cmd = 'colmap model_converter --input_path {0} --output_path {1} --output_type TXT'.format(
+        os.path.join(basepath, 'aligned'), os.path.join(basepath, 'aligned'))
+    cmd_list.append(cmd)
     for cmd in cmd_list:
         print(cmd)
         os.system(cmd)
