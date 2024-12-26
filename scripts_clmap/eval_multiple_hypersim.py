@@ -12,6 +12,33 @@ import limap.util.io as limapio
 from runners_clmap.hypersim.Hypersim import Hypersim
 
 import matplotlib.pyplot as plt
+import open3d as o3d
+
+
+def create_line_set(line3d_list, colors=[0.0, 1.0, 0.0]):
+    o3d_points, o3d_lines, o3d_colors = [], [], []
+
+    for counter, line3d in enumerate(line3d_list):
+        o3d_points.append(line3d.start)
+        o3d_points.append(line3d.end)
+        o3d_lines.append([2 * counter, 2 * counter + 1])
+        o3d_colors.append(colors)
+
+    line_set = o3d.geometry.LineSet()
+    line_set.points = o3d.utility.Vector3dVector(o3d_points)
+    line_set.lines = o3d.utility.Vector2iVector(o3d_lines)
+    line_set.colors = o3d.utility.Vector3dVector(o3d_colors)
+    return line_set
+
+
+def create_point_cloud(points, colors=[0.0, 0.0, 1.0]):
+    o3d_colors = []
+    for i in range(len(points)):
+        o3d_colors.append(colors)
+    point_cloud = o3d.geometry.PointCloud()
+    point_cloud.points = o3d.utility.Vector3dVector(points)
+    point_cloud.colors = o3d.utility.Vector3dVector(o3d_colors)
+    return point_cloud
 
 
 # hypersim
@@ -94,7 +121,6 @@ def report_error_to_mesh(mesh_fname, lines, vis_err_th=None):
 
 
 def report_error_to_point_cloud(points, lines, kdtree_dir=None, vis_err_th=None):
-    # CLMAP: fix possible bugs
     # evaluator = _eval.PointCloudEvaluator(points, vis_err_th=vis_err_th)
     evaluator = _eval.PointCloudEvaluator(points)
     if kdtree_dir is None:
@@ -102,8 +128,6 @@ def report_error_to_point_cloud(points, lines, kdtree_dir=None, vis_err_th=None)
         evaluator.Save('tmp/kdtree.bin')
     else:
         evaluator.Load(kdtree_dir)
-    # CLMAP: fix possible bugs.
-    # return report_error_to_GT(evaluator, lines)
     return report_error_to_GT(evaluator, lines, vis_err_th=vis_err_th)
 
 
@@ -141,7 +165,6 @@ def eval_hypersim_RP(cfg, lines, dataset_hypersim, scene_id, cam_id=0, vis_err_t
         # visualize GT points and reconstructed lines together
         if cfg["visualize"]:
             import open3d as o3d
-            from limap.runners_clmap.visualize_3d_planes_bpt import create_line_set, create_point_cloud
             point_list = [points[i, :] for i in range(points.shape[0])]
             print("number of points =", len(point_list))
             print("number of lines =", len(lines))
@@ -278,7 +301,7 @@ def evaluate_multiple_hypersim_visible_GT_point_cloud(cfg):
 def parse_config():
     import argparse
     arg_parser = argparse.ArgumentParser(
-        description="Evaluate multiple 3d line maps on Hypersim dataset for CLMAP, LIMAP or L3D++. (only support visible GT point cloud (generated from GT depth map and GT poses) now)")
+        description="Evaluate multiple 3d line maps on Hypersim dataset for L3D++, LIMAP, CLMAP, and IncreLM. (only support visible GT point cloud (generated from GT depth map and GT poses) now)")
     arg_parser.add_argument("-i", "--input_path_list", type=str, required=True, help="scene id & 3D line map path list")
     arg_parser.add_argument('-c', '--config_file', type=str,
                             default='cfgs_clmap/eval/hypersim.yaml', help='config file')
@@ -302,10 +325,10 @@ def parse_config():
 
 def main():
     # line map format:
-    #   CLMAP/LIMAP: *.npy (no line tracks) or *.obj (no line tracks) or folder-to-linetracks (contains line tracks).
+    #   LIMAP/CLMAP/IncreLM: *.npy (no line tracks) or *.obj (no line tracks) or folder-to-linetracks (contains line tracks).
     #   L3D++: .txt (contains line tracks).
     # Note:
-    #   If you want to evaluate the quality of line tracks, the format of input line map must be folder-to-linetracks for CLMAP/LIMAP or .txt for L3D++.
+    #   If you want to evaluate the quality of line tracks, the format of input line map must be folder-to-linetracks for LIMAP/CLMAP/IncreLM or .txt for L3D++.
 
     cfg = parse_config()
 
