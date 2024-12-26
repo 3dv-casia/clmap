@@ -128,11 +128,9 @@ def vis_colmap_sfm_log(log_path):
                 i = 0
                 continue
             i += 1
-    # print(Ts)
     # create imagecols
     default_h, default_w = 768, 1024
     h, w = default_h, default_w
-    # fov_x = 60 * np.pi / 180  # set fov_x to pi/3 to match DIODE dataset (60 degrees)
     fov_x = np.pi / 3  # set fov_x to pi/3 to match DIODE dataset (60 degrees)
     f = w / (2 * np.tan(fov_x / 2))
     default_K = np.array([[f, 0, w / 2],

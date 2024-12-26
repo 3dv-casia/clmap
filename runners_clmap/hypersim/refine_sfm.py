@@ -19,7 +19,6 @@ from runners_clmap.colmap_triangulation import run_colmap_triangulation
 from runners_clmap.plp_association import run_plp_association
 
 
-
 def run_scene_hypersim(imagecols_output_dir, tri_cfg, plp_cfg, hypersim_dataset, scene_id, cam_id=0):
     imagecols_gt = read_scene_hypersim(
         tri_cfg, hypersim_dataset, scene_id, cam_id=cam_id, load_depth=False)
@@ -53,7 +52,6 @@ def run_scene_hypersim(imagecols_output_dir, tri_cfg, plp_cfg, hypersim_dataset,
     tri_cfg["info_path"] = None
     linetracks, undistort_model_path = run_colmap_triangulation(
         tri_cfg, colmap_path, model_path="sparse/0", image_path="images")
-    # colmap_folder = os.path.join(undistort_model_path, "sparse")
     plp_input_dir = os.path.join(tri_cfg["output_dir"], tri_cfg["output_folder"])
     _, _, linetracks, _, _, _, _, _, _ = run_plp_association(plp_cfg, plp_input_dir, colmap_folder)
 

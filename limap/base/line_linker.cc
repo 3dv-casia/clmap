@@ -12,10 +12,6 @@ namespace limap
 
   double get_multiplier(const double &score_th)
   {
-    // exp(- (val / sigma)^2 / 2.0) >= 0.5 <--> val <= 1.1774100 sigma
-
-    // CLMAP: to fix possible bugs.
-    // return sqrt(-log(score_th) * 2.0);
     return 1.0 / sqrt(-log(score_th) * 2.0);
   }
 
@@ -23,10 +19,6 @@ namespace limap
                                            const Line2d &l2) const
   {
     double angle = compute_angle<Line2d>(l1, l2);
-    // std::cout << "config.score_th = " << config.score_th << std::endl;
-    // std::cout << "config.multiplier() = " << config.multiplier() << std::endl;
-    // std::cout << "score1 (angle = config.th_angle) = " << expscore(config.th_angle, config.th_angle * config.multiplier()) << std::endl;
-    // std::cout << "score2 (angle = config.th_angle) = " << expscore(config.th_angle, config.th_angle / config.multiplier()) << std::endl;
     double score = expscore(angle, config.th_angle * config.multiplier());
     if (score < config.score_th)
       score = 0.0;

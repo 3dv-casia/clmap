@@ -86,7 +86,6 @@ def report_error_to_mesh(mesh_fname, lines, vis_err_th=None):
 
 
 def report_error_to_point_cloud(points, lines, kdtree_dir=None, vis_err_th=None):
-    # CLMAP: to fix possible bugs.
     # evaluator = _eval.PointCloudEvaluator(points, vis_err_th=vis_err_th)
     evaluator = _eval.PointCloudEvaluator(points)
     if kdtree_dir is None:

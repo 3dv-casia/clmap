@@ -83,7 +83,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None, colmap_model
     t1 = time.time()
     if not cfg["triangulation"]["use_exhaustive_matcher"]:
         if not cfg["triangulation"]['match_lines_by_epipolar_IoU']:
-            matches_dir = _runners_clmap.compute_matches(cfg, descinfo_folder, imagecols.get_img_ids(), neighbors)
+            matches_dir = _runners.compute_matches(cfg, descinfo_folder, imagecols.get_img_ids(), neighbors)
     t2 = time.time()
     time_dict["match 2D lines"] = t2 - t1
 

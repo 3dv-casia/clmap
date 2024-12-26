@@ -8,60 +8,6 @@ import limap.util.io as limapio
 import limap.structures as _structures
 
 
-def setup(cfg):
-    folder_save = cfg["output_dir"]
-    if folder_save is None:
-        folder_save = 'tmp'
-    limapio.check_makedirs(folder_save)
-    folder_load = cfg["load_dir"]
-    if cfg["use_tmp"]:
-        folder_load = "tmp"
-    if folder_load is None:
-        folder_load = folder_save
-    cfg["dir_save"] = folder_save
-    cfg["dir_load"] = folder_load
-    print("[LOG] Output dir: {0}".format(cfg["dir_save"]))
-    print("[LOG] Loading dir: {0}".format(cfg["dir_load"]))
-    if "weight_path" in cfg and cfg["weight_path"] is not None:
-        cfg["weight_path"] = os.path.expanduser(cfg["weight_path"])
-        print("[LOG] weight dir: {0}".format(cfg["weight_path"]))
-    return cfg
-
-
-def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
-    """
-    Match lines for each image with its visual neighbors
-
-    Args:
-        cfg (dict): Configuration
-        descinfo_folder (str): path to store the descriptors
-        image_ids (list[int]): list of image ids
-        neighbors (dict[int -> list[int]]): visual neighbors for each image
-    Returns:
-        matches_folder (str): path to store the computed matches
-    """
-    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
-    print("[LOG] Start matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2}, n_neighbors = {3})".format(
-        cfg["line2d"]["extractor"]["method"], cfg["line2d"]["matcher"]["method"], len(image_ids), cfg["n_neighbors"]))
-    import limap.line2d
-    basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]
-                           ["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
-    extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"], weight_path=weight_path)
-    se_match = cfg["skip_exists"] or cfg["line2d"]["matcher"]["skip_exists"]
-    matcher = limap.line2d.get_matcher(cfg["line2d"]["matcher"], extractor,
-                                       n_neighbors=cfg["n_neighbors"], weight_path=weight_path)
-    folder_save = os.path.join(cfg["dir_save"], basedir)
-    if not cfg["load_match"]:
-        matches_folder = matcher.match_all_neighbors(
-            folder_save, image_ids, neighbors, descinfo_folder, skip_exists=se_match)
-    else:
-        folder_load = os.path.join(cfg["dir_load"], basedir)
-        matches_folder = matcher.get_matches_folder(folder_load)
-    if ("save_l3dpp_matches" in cfg["line2d"]) and cfg["line2d"]["save_l3dpp_matches"]:
-        limapio.save_l3dpp_matches(os.path.join(folder_save, "l3dpp_matches_format"), image_ids, matches_folder)
-    return matches_folder
-
-
 def eval_support_relations_consistency(line_mapper, best_proposal_type):
     th_angle_list = [1, 5, 10]  # in degrees
     for th_angle in th_angle_list:
@@ -125,13 +71,13 @@ def compute_2d_bipartites_from_colmap(reconstruction, imagecols, all_2d_lines, c
         if orig_size != new_size:
             xys[:, 0] = xys[:, 0] * new_size[0] / orig_size[0]
             xys[:, 1] = xys[:, 1] * new_size[1] / orig_size[1]
-            # print(f"orig_size = {orig_size}, new_size = {new_size}, img_id = {img_id}")
 
         # init bpt2d
         bpt2d = _structures.PL_Bipartite2d(cfg_bpt2d)
         bpt2d.init_lines(all_2d_lines[img_id])
         bpt2d.add_keypoints_with_point3D_ids(xys[mask], point3D_ids[mask], indexes[mask])
         all_bpt2ds[img_id] = bpt2d
+        
     points = {}
     for point3d_id, p in tqdm(colmap_points.items()):
         if p.image_ids.shape[0] >= min_support_images:

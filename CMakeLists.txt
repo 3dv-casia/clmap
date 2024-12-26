@@ -128,6 +128,9 @@ LIMAP_ADD_SOURCE_DIR(limap/optimize/line_localization BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/clmap BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/clmap/base BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/clmap/mapping BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/clmap/optim BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/clmap/plane_detection BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/clmap/structure BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/clmap/util BASE_SRCS *.h *.cc)
 
 
