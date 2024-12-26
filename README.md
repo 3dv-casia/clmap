@@ -12,7 +12,7 @@ Official implementation of paper "Consistent 3D Line Mapping" at ECCV 2024.
 
 ## Installation
 - This repository requires Python 3.9+ and CMake >= 3.17. 
-- We test this repository on **Ubuntu 22.04**.
+- We test this repository on **Ubuntu 20.04** and **Ubuntu 22.04**.
 - This repository does not currently support Windows systems.
 
 The following script is an example of a conda environment setup.
@@ -21,20 +21,20 @@ The following script is an example of a conda environment setup.
 # 1. Install COLMAP 3.8
 #  * Guide: https://colmap.github.io/install.html. (make sure to use the tag 3.8)
 
-# 2. Install PoseLib
+# 2. Install PoseLib.
 #  * Guide: misc/install/poselib.md
 
-# 3. Install HDF5
+# 3. Install HDF5.
 sudo apt-get install libhdf5-dev
 
-# 4. Create a conda environment
+# 4. Create a conda environment.
 conda create -n clmap python==3.9
 conda activate clmap
 
 # 5. Install PyTorch (torch>=1.12). Please refer to https://pytorch.org/get-started/previous-versions/ to select the appropriate version.
 pip install torch==1.12.0+cu116 torchvision==0.13.0+cu116 torchaudio==0.12.0 --extra-index-url https://download.pytorch.org/whl/cu116
 
-# 6. Install CLMAP
+# 6. Install CLMAP.
 git clone --recursive https://github.com/3dv-casia/clmap.git
 cd clmap
 pip install -r requirements.txt
@@ -50,24 +50,32 @@ Download the test scene *ai\_001\_001* in [Hypersim](https://github.com/apple/ml
 bash scripts_clmap/quickstart.sh
 ```
 
-### 2. Line mapping without joint optimization
+### 2. Line mapping
 To run line mapping (RGB-only) on scene *ai\_001\_001*:
 ```bash
-python runners_clmap/hypersim/triangulation.py --output_dir outputs/quickstart_triangulation
+# 1. Run line triangulation: line detection & matching, proposal generation, best proposal selection, and line track building.
+tri_output_dir=outputs/quickstart_triangulation
+python runners_clmap/hypersim/triangulation.py --output_dir ${tri_output_dir}
+# evaluate and print the consistency percentage with "--triangulation.debug_mode True"
+
+# 2. Run joint optimization with 3D points, 3D lines, 3D planes, and vanishing points (VPs).
+plp_output_dir=outputs/quickstart_plp_association
+python runners_clmap/plp_association.py --input_folder ${tri_output_dir}/finaltracks --colmap_model_path ${tri_output_dir}/colmap_outputs/sparse --visualize True --load_dir ${tri_output_dir} --load_vpdet True --output_dir ${plp_output_dir}
+# if `visualize` is set to True, you need to close the visualization window in order to continue running the program
 ```
 
 ### 3. Visualization
 To run visualization of the 3D line map after the reconstruction:
 ```bash
-python visualize_3d_lines.py --input_dir outputs/quickstart_triangulation/finaltracks 
-# add the camera frustums with "--imagecols outputs/quickstart_triangulation/imagecols.npy"
+python visualize_3d_lines.py --input_dir ${plp_output_dir}/finaltracks -nv 4
+# add the camera frustums with "--imagecols ${plp_output_dir}/finaltracks/imagecols.npy"
 ```
 
 ### 4. Evaluation
 
 To run evaluation of the 3D line map:
 ```bash
-python scripts_clmap/eval_hypersim.py --input_dir outputs/quickstart_triangulation/finaltracks
+python scripts_clmap/eval_hypersim.py --input_dir ${plp_output_dir}/finaltracks
 # specify the number of visible views with "-nv ${nv}" (4 visible views by default)
 ```
 
@@ -91,14 +99,13 @@ bash experiments/line_mapping_from_colmap.sh ${colmap_path} ${model_path} ${imag
 Download the first eight scenes (100 images per scene) of the [Hypersim](https://github.com/apple/ml-hypersim) dataset with the following script.
 
 ```bash
-hypersim_data_dir=./dataset/hypersim  # dataset directory (any directory is fine, but note it requires approximately 35 GB)
+hypersim_data_dir=./dataset/hypersim  # dataset directory (any directory is fine, but note it requires at least 33 GB free space)
 bash experiments/hypersim/download.sh ${hypersim_data_dir}
 ```
 
 ### 2. Run 3D line mapping on Hypersim dataset
 
 ```bash
-hypersim_data_dir=./dataset/hypersim  # dataset directory
 hypersim_output_dir=./outputs/hypersim/line_mapping  # output directory (any directory is fine)
 bash experiments/run_hypersim.sh ${hypersim_data_dir} ${hypersim_output_dir}
 ```
@@ -113,10 +120,10 @@ bash experiments/run_hypersim.sh ${hypersim_data_dir} ${hypersim_output_dir}
 
 ### 1. Prepare *Tanks and Temples* dataset
 
-Download the `image set` of `Training Data` of the [*Tanks and Temples*](https://www.tanksandtemples.org/) dataset from the [official link](https://www.tanksandtemples.org/download/), and save the data like the following form:
+Download the `image set` of the `Training Data` of the [*Tanks and Temples*](https://www.tanksandtemples.org/) dataset from the [official link](https://www.tanksandtemples.org/download/), and save the data like the following form:
 
 ```bash
-tnt_data_dir=./dataset/tnt  # Tanks and Temples dataset directory (any directory is fine, note it requires approximately 13 GB)
+tnt_data_dir=./dataset/tnt  # Tanks and Temples dataset directory (any directory is fine, but note it requires at least 26 GB free space)
 
 ${tnt_data_dir}/training
 ├── Barn
@@ -132,7 +139,7 @@ ${tnt_data_dir}/training
 └── Truck
 ```
 
-Download `meta_train` data from the [official link](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?usp=sharing&resourcekey=), rename the unzipped `trainingdata` folder as the `meta_train` and save the data like the following form:
+Download the `meta_train` data from the [official link](https://drive.google.com/file/d/1jAr3IDvhVmmYeDWi0D_JfgiHcl70rzVE/view?usp=sharing&resourcekey=), unzip it, and rename the unzipped `trainingdata` folder as the `meta_train` and save the data like the following form:
 
 ```bash
 ${tnt_data_dir}/meta_train
@@ -151,11 +158,11 @@ ${tnt_data_dir}/meta_train
 └── Truck
 ```
 
-Run COLMAP and align COLMAP model on the [*Tanks and Temples*](https://www.tanksandtemples.org/) dataset with the following script.
+Run COLMAP and align the COLMAP model on the [*Tanks and Temples*](https://www.tanksandtemples.org/) dataset with the following script.
 
 ```bash
-# 1. Run COLMAP on `Training Data` without considering scene `Ignatius`
-tnt_colmap_dir=./dataset/tnt/colmap
+# 1. Run COLMAP on the `Training Data` without considering the scene `Ignatius`.
+tnt_colmap_dir=${tnt_data_dir}/colmap
 bash experiments/tnt/run_colmap.sh ${tnt_data_dir}/training ${tnt_colmap_dir}
 
 # 2. Align COLMAP models with the Ground Truth point clouds.
@@ -169,8 +176,7 @@ bash experiments/tnt/align_colmap.sh ${tnt_data_dir}/meta_train ${tnt_colmap_dir
 
 ```bash
 tnt_output_dir=./outputs/tnt/line_mapping
-tnt_meta_train_dir=${tnt_data_dir}/meta_train
-bash experiments/run_tnt.sh ${tnt_output_dir} ${tnt_meta_train_dir} ${tnt_colmap_dir} False
+bash experiments/run_tnt.sh ${tnt_output_dir} ${tnt_data_dir}/meta_train ${tnt_colmap_dir} False
 ```
 - We test [LSD](https://github.com/iago-suarez/pytlsd) lines and [DeepLSD](https://github.com/cvg/DeepLSD) lines, equipped with the [GlueStick](https://github.com/cvg/GlueStick) line matcher (Top 10 matching). 
 
