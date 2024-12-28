@@ -208,7 +208,12 @@ void LineTrack::Read(const std::string& filename) {
         file >> line.end[i];
     // row2: counts
     size_t n_lines, n_images; file >> n_lines >> n_images;
-    Resize(n_lines);
+
+    // only the indispensable properties are initialized
+    image_id_list.resize(n_lines);
+    line_id_list.resize(n_lines);
+    line2d_list.resize(n_lines);
+
     // row3: image id
     std::string str; 
     file >> str; THROW_CHECK_EQ(str, "image_id_list");
@@ -236,6 +241,11 @@ void LineTrack::Read(const std::string& filename) {
     //////////////////////////////////////////////////////////////////////////////////////////
     // auxiliary information
     //////////////////////////////////////////////////////////////////////////////////////////
+
+    node_id_list.resize(n_lines);
+    score_list.resize(n_lines);
+    line3d_list.resize(n_lines);
+
     // row6: node_id_list
     THROW_CHECK_EQ(str, "node_id_list");
     for (size_t i = 0; i < n_lines; ++i)

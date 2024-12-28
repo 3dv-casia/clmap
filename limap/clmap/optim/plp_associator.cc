@@ -7,6 +7,7 @@
 #include <unordered_set>
 
 #include "base/camera_models.h"
+#include "base/camera_view.h"
 #include "ceresbase/parameterization.h"
 #include "optimize/global_pl_association/cost_functions.h"
 #include "optimize/hybrid_bundle_adjustment/cost_functions.h"
@@ -1172,9 +1173,29 @@ void PLPAssociator::UpdateLineTracks(int num_outliers_aggregate) {
     int line3d_id = it->first;
     auto& line_track = it->second;
 
-    Line3d line3d = GetLineSegmentFromInfiniteLine3d(
-        lines_.at(line3d_id).GetInfiniteLine(), line_track.line3d_list,
-        num_outliers_aggregate);
+    
+    Line3d line3d;
+    if (line_track.line3d_list.empty()) {
+      // collect views for each observed 2D line segment
+      size_t n_views = line_track.image_id_list.size();
+      std::vector<CameraView> views(n_views);
+      for (size_t i = 0; i < n_views; i++) {
+        views[i] = imagecols_.camview(line_track.image_id_list[i]);
+      }
+      // collect line2ds for each observed 2D line segment
+      std::vector<Line2d> line2ds(n_views);
+      for (size_t i = 0; i < n_views; i++) {
+        line2ds[i] = line_track.line2d_list[i];
+      }
+      line3d = GetLineSegmentFromInfiniteLine3d(
+          lines_.at(line3d_id).GetInfiniteLine(), views, line2ds,
+          num_outliers_aggregate);
+    } else {
+      line3d = GetLineSegmentFromInfiniteLine3d(
+          lines_.at(line3d_id).GetInfiniteLine(), line_track.line3d_list,
+          num_outliers_aggregate);
+    }
+
     line_track.line = line3d;
 
     // TODO: filter linetrack
