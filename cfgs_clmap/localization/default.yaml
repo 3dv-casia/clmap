@@ -108,7 +108,7 @@ sfm:
 line2d:
     max_num_2d_segs: 3000
     do_merge_lines: False
-    visualize: False                           # output detected 2D line segments image
+    visualize: True                            # output detected 2D line segments image
     visualize_point_line_association: False    # TODO: output point-line association image
     visualize_line_vp_association: False       # TODO: output line-vp association image
     visualize_one_to_many_line_matches: False  # TODO: output two subimage, the left subimage shows a reference line, and the right subimage shows the matched top K lines
