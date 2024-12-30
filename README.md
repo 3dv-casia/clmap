@@ -88,8 +88,10 @@ model_path=sparse
 image_path=images
 bash experiments/line_mapping_from_colmap.sh ${colmap_path} ${model_path} ${image_path} ${output_dir}
 ```
-- Please refer to `experiments/line_mapping_from_colmap.sh` for details.
-- The final line map is saved in `${output_dir}/plp/finaltracks`.
+- Please refer to `experiments/line_mapping_from_colmap.sh` for detail settings.
+- The above program includes both **line triangulation** (to produce the initial map) and **joint optimization** (to take the initial map as the input and produce the final map).
+- The initial line map without filtering based on visible views is saved in `${output_dir}/tri/finaltracks`, while the initial line map with each 3D line segment containing at least 4 visible views is saved in `${output_dir}/tri/alltracks_nv4.txt`.
+- The final line map without filtering based on visible views is saved in `${output_dir}/plp/finaltracks`, while the final line map with each 3D line segment containing at least 4 visible views is saved in `${output_dir}/plp/alltracks_nv4.txt`.
 
 ## Evaluation on Hypersim dataset
 [Hypersim](https://github.com/apple/ml-hypersim) is a photorealistic synthetic dataset for holistic indoor scene understanding.
@@ -99,14 +101,14 @@ bash experiments/line_mapping_from_colmap.sh ${colmap_path} ${model_path} ${imag
 Download the first eight scenes (100 images per scene) of the [Hypersim](https://github.com/apple/ml-hypersim) dataset with the following script.
 
 ```bash
-hypersim_data_dir=./dataset/hypersim  # dataset directory (any directory is fine, but note it requires at least 33 GB free space)
+hypersim_data_dir=<path_to_dataset>/hypersim  # Hypersim dataset directory (requires at least 33GB free space)
 bash experiments/hypersim/download.sh ${hypersim_data_dir}
 ```
 
 ### 2. Run 3D line mapping on Hypersim dataset
 
 ```bash
-hypersim_output_dir=./outputs/hypersim/line_mapping  # output directory (any directory is fine)
+hypersim_output_dir=<path_to_output>/hypersim/line_mapping
 bash experiments/run_hypersim.sh ${hypersim_data_dir} ${hypersim_output_dir}
 ```
 - We test [LSD](https://github.com/iago-suarez/pytlsd) lines and [DeepLSD](https://github.com/cvg/DeepLSD) lines, equipped with the [GlueStick](https://github.com/cvg/GlueStick) line matcher (Top 10 matching). 
@@ -123,7 +125,7 @@ bash experiments/run_hypersim.sh ${hypersim_data_dir} ${hypersim_output_dir}
 Download the `image set` of the `Training Data` of the [*Tanks and Temples*](https://www.tanksandtemples.org/) dataset from the [official link](https://www.tanksandtemples.org/download/), and save the data like the following form:
 
 ```bash
-tnt_data_dir=./dataset/tnt  # Tanks and Temples dataset directory (any directory is fine, but note it requires at least 26 GB free space)
+tnt_data_dir=<path_to_dataset>/tnt  # Tanks and Temples dataset directory (requires at least 26GB free space)
 
 ${tnt_data_dir}/training
 ├── Barn
@@ -175,7 +177,7 @@ bash experiments/tnt/align_colmap.sh ${tnt_data_dir}/meta_train ${tnt_colmap_dir
 ### 2. Run 3D line mapping on *Tanks and Temples* dataset
 
 ```bash
-tnt_output_dir=./outputs/tnt/line_mapping
+tnt_output_dir=<path_to_output>/tnt/line_mapping
 bash experiments/run_tnt.sh ${tnt_output_dir} ${tnt_data_dir}/meta_train ${tnt_colmap_dir} False
 ```
 - We test [LSD](https://github.com/iago-suarez/pytlsd) lines and [DeepLSD](https://github.com/cvg/DeepLSD) lines, equipped with the [GlueStick](https://github.com/cvg/GlueStick) line matcher (Top 10 matching). 
