@@ -41,9 +41,9 @@ line2d:
     max_num_2d_segs: 3000
     do_merge_lines: False
     visualize: False                           # output detected 2D line segments image
-    visualize_point_line_association: False    # output point-line association image
-    visualize_line_vp_association: False       # output line-vp association image
-    visualize_one_to_many_line_matches: False  # output two subimage, the left subimage shows a reference line, and the right subimage shows the matched top K lines
+    visualize_point_line_association: False    # TODO: output point-line association image
+    visualize_line_vp_association: False       # TODO: output line-vp association image
+    visualize_one_to_many_line_matches: False  # TODO: output two subimage, the left subimage shows a reference line, and the right subimage shows the matched top K lines
     save_l3dpp: False  # save lines in l3dpp format
     save_l3dpp_matches: False  # save line matches in l3dpp format
     compute_descinfo: False
