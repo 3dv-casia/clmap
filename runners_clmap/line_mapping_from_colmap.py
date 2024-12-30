@@ -111,7 +111,7 @@ def parse_config():
 def main():
     tri_cfg, plp_cfg, use_optim = parse_config()
 
-    # triangulation: line detection & matching, proposal generation, best proposal selection, line track building
+    # Run line triangulation: line detection & matching & feature association, proposal generation, best proposal selection, and line track building
     linetracks, colmap_model_path = run_colmap_triangulation(
         tri_cfg, tri_cfg["colmap_path"], tri_cfg["model_path"], tri_cfg["image_path"])
 
@@ -119,7 +119,7 @@ def main():
     plp_cfg["load_dir"] = tri_cfg["output_dir"]
     plp_cfg["load_vpdet"] = True
 
-    # joint optimization
+    # Run joint optimization with 3D points, 3D lines, 3D planes, and vanishing points (VPs)
     if use_optim:
         plp_input_dir = os.path.join(tri_cfg["output_dir"], tri_cfg["output_folder"])
         run_plp_association(plp_cfg, plp_input_dir, colmap_model_path)

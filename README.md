@@ -19,7 +19,7 @@ The following script is an example of a conda environment setup.
 
 ```bash
 # 1. Install COLMAP 3.8
-#  * Guide: https://colmap.github.io/install.html. (make sure to use the tag 3.8)
+#  * Guide: https://colmap.github.io/install.html (make sure to use the tag 3.8)
 
 # 2. Install PoseLib.
 #  * Guide: misc/install/poselib.md
@@ -53,7 +53,7 @@ bash scripts_clmap/quickstart.sh
 ### 2. Line mapping
 To run line mapping (RGB-only) on scene *ai\_001\_001*:
 ```bash
-# 1. Run line triangulation: line detection & matching, proposal generation, best proposal selection, and line track building.
+# 1. Run line triangulation: line detection & matching & feature association, proposal generation, best proposal selection, and line track building.
 tri_output_dir=outputs/quickstart_triangulation
 python runners_clmap/hypersim/triangulation.py --output_dir ${tri_output_dir}
 # evaluate and print the consistency percentage with "--triangulation.debug_mode True"
@@ -89,7 +89,7 @@ image_path=images
 bash experiments/line_mapping_from_colmap.sh ${colmap_path} ${model_path} ${image_path} ${output_dir}
 ```
 - Please refer to `experiments/line_mapping_from_colmap.sh` for detail settings.
-- The above program includes both **line triangulation** (to produce the initial map) and **joint optimization** (to take the initial map as the input and produce the final map).
+- The above program includes both **line triangulation** (to produce the initial line map) and **joint optimization** (to take the initial line map as the input and produce the final line map).
 - The initial line map without filtering based on visible views is saved in `${output_dir}/tri/finaltracks`, while the initial line map with each 3D line segment containing at least 4 visible views is saved in `${output_dir}/tri/alltracks_nv4.txt`.
 - The final line map without filtering based on visible views is saved in `${output_dir}/plp/finaltracks`, while the final line map with each 3D line segment containing at least 4 visible views is saved in `${output_dir}/plp/alltracks_nv4.txt`.
 
@@ -113,8 +113,8 @@ bash experiments/run_hypersim.sh ${hypersim_data_dir} ${hypersim_output_dir}
 ```
 - We test [LSD](https://github.com/iago-suarez/pytlsd) lines and [DeepLSD](https://github.com/cvg/DeepLSD) lines, equipped with the [GlueStick](https://github.com/cvg/GlueStick) line matcher (Top 10 matching). 
 
-- Evaluation results for initial line maps (i.e., without joint optimization) are reported in `${hypersim_output_dir}/lsd/tri/eval_log_nv_4.txt` and `${hypersim_output_dir}/deeplsd/tri/eval_log_nv_4.txt`.
-- Evaluation results for final line maps (i.e., with joint optimization) are reported in `${hypersim_output_dir}/lsd/plp/eval_log_nv_4.txt` and `${hypersim_output_dir}/deeplsd/plp/eval_log_nv_4.txt`.
+- The evaluation results of the initial line maps (i.e., without joint optimization) on the LSD line detector and the DeepLSD line detector are saved in `${hypersim_output_dir}/lsd/tri/eval_log_nv_4.txt` and `${hypersim_output_dir}/deeplsd/tri/eval_log_nv_4.txt`, respectively.
+- The evaluation results of the final line maps (i.e., with joint optimization) on the LSD line detector and the DeepLSD line detector are saved in `${hypersim_output_dir}/lsd/plp/eval_log_nv_4.txt` and `${hypersim_output_dir}/deeplsd/plp/eval_log_nv_4.txt`, respectively.
 
 ## Evaluation on *Tanks and Temples* dataset
 
@@ -182,8 +182,8 @@ bash experiments/run_tnt.sh ${tnt_output_dir} ${tnt_data_dir}/meta_train ${tnt_c
 ```
 - We test [LSD](https://github.com/iago-suarez/pytlsd) lines and [DeepLSD](https://github.com/cvg/DeepLSD) lines, equipped with the [GlueStick](https://github.com/cvg/GlueStick) line matcher (Top 10 matching). 
 
-- Evaluation results for initial line maps (i.e., without joint optimization) are reported in `${tnt_output_dir}/lsd/tri/eval_log_nv_4.txt` and `${tnt_output_dir}/deeplsd/tri/eval_log_nv_4.txt`.
-- Evaluation results for final line maps (i.e., with joint optimization) are reported in `${tnt_output_dir}/lsd/plp/eval_log_nv_4.txt` and `${tnt_output_dir}/deeplsd/plp/eval_log_nv_4.txt`.
+- The evaluation results of the initial line maps (i.e., without joint optimization) on the LSD line detector and the DeepLSD line detector are saved in `${tnt_output_dir}/lsd/tri/eval_log_nv_4.txt` and `${tnt_output_dir}/deeplsd/tri/eval_log_nv_4.txt`, respectively.
+- The evaluation results of the final line maps (i.e., with joint optimization) on the LSD line detector and the DeepLSD line detector are saved in `${tnt_output_dir}/lsd/plp/eval_log_nv_4.txt` and `${tnt_output_dir}/deeplsd/plp/eval_log_nv_4.txt`, respectively.
 
 ## Possible issues
 ### 'GLIBCXX_3.4.30' not found
