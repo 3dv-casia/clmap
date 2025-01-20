@@ -11,6 +11,10 @@ void bind_clmap_bipartite_builder(py::module& m) {
   m.def("build_init_LP_Bipartite3d", &BuildInitLP_Bipartite3d);
   m.def("filter_inf_plane3d_with_PP_LP_Bipartite3d",
         &FilterInfPlane3dWithPP_LP_Bipartite3d);
+  m.def("GetInlierPoint3dsFromPP_Bipartite3d",
+        &GetInlierPoint3dsFromPP_Bipartite3d);
+  m.def("GetInlierLine3dsFromLP_Bipartite3d",
+        &GetInlierLine3dsFromLP_Bipartite3d);
 }
 
 void bind_clmap_structure(py::module& m) { bind_clmap_bipartite_builder(m); }

@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.spatial import ConvexHull
 import open3d as o3d
+import _limap._clmap as _clmap
 
 
 def create_line_set(line3d_list, colors=[0.0, 1.0, 0.0]):
@@ -144,25 +145,14 @@ def create_geometries_from_lp_bpt3d_pp_bpt3d(pp_bpt3d, lp_bpt3d, plane_id_to_rgb
     import time
     t1 = time.time()
     # create o3d.geometry.LineSet using associated 3D lines
-    lines3d = []
-    for k, v in lp_bpt3d.n_1_to_2.items():
-        linetrack_id = k
-        if len(v) > 0:
-            linetrack = lp_bpt3d.obj1_map[linetrack_id]
-            lines3d.append(linetrack.line)
+    lines3d = _clmap.GetInlierLine3dsFromLP_Bipartite3d(lp_bpt3d)
     line_set = create_line_set(lines3d)
     t2 = time.time()
     print(f"time of create_line_set: {t2 - t1} s", flush=True)
 
     # create o3d.geometry.PointCloud using associated SfM points
-    # TODO: potential efficiency improvement here
     t1 = time.time()
-    sfm_points = []
-    for k, v in pp_bpt3d.n_1_to_2.items():
-        pointtrack_id = k
-        if len(v) > 0:
-            pointtrack = pp_bpt3d.obj1_map[pointtrack_id]
-            sfm_points.append(np.array(pointtrack.p))
+    sfm_points = _clmap.GetInlierPoint3dsFromPP_Bipartite3d(pp_bpt3d)
     t2 = time.time()
     print(f"time of append sfm_points: {t2 - t1} s", flush=True)
 

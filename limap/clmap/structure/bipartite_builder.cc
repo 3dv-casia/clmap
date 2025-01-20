@@ -184,4 +184,26 @@ FilterInfPlane3dWithPP_LP_Bipartite3d(
           new_lp_bpt3d};
 }
 
+std::vector<V3D> GetInlierPoint3dsFromPP_Bipartite3d(
+    const PP_Bipartite3d& pp_bpt3d) {
+  std::vector<V3D> points;
+  for (const auto& pair : pp_bpt3d.n_1_to_2) {
+    if (!pair.second.empty()) {  // The point has an associated plane
+      points.push_back(pp_bpt3d.obj1_map.at(pair.first).p);
+    }
+  }
+  return points;
+}
+
+std::vector<Line3d> GetInlierLine3dsFromLP_Bipartite3d(
+    const LP_Bipartite3d& lp_bpt3d) {
+  std::vector<Line3d> lines;
+  for (const auto& pair : lp_bpt3d.n_1_to_2) {
+    if (!pair.second.empty()) {  // The line has an associated plane
+      lines.push_back(lp_bpt3d.obj1_map.at(pair.first).line);
+    }
+  }
+  return lines;
+}
+
 }  // namespace limap

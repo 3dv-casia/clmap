@@ -33,4 +33,10 @@ FilterInfPlane3dWithPP_LP_Bipartite3d(
     const PP_Bipartite3d& pp_bpt3d, const LP_Bipartite3d& lp_bpt3d,
     int min_support_lines = 2);
 
+std::vector<V3D> GetInlierPoint3dsFromPP_Bipartite3d(
+    const PP_Bipartite3d& pp_bpt3d);
+
+std::vector<Line3d> GetInlierLine3dsFromLP_Bipartite3d(
+    const LP_Bipartite3d& lp_bpt3d);
+
 }  // namespace limap
