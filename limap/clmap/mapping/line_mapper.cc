@@ -699,7 +699,7 @@ void LineMapper::TriangulateImage(
         // vp2
         if (vp_results_[ng_image_id].HasVP(ng_matched_line2D_idx)) {
           V3D direc = limap::triangulation::getDirectionFromVP(
-              vp_results_[ng_image_id].GetVP(ng_matched_line2D_idx), ref_view);
+              vp_results_[ng_image_id].GetVP(ng_matched_line2D_idx), ng_view);
           Line3d line = limap::triangulation::triangulate_with_direction(
               l1, ref_view, l2, ng_view, direc);
           if (line.score > 0) {
